@@ -54,6 +54,51 @@ font-weight:bold;
 input.error{
 border:1px solid red;
 }
+
+/* Touch-friendly navigation */
+.navbar-nav .nav-link {
+    padding: 15px 20px !important;
+    font-size: 1.1rem;
+    margin: 0 5px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .navbar-nav .nav-link {
+        padding: 20px !important;
+        font-size: 1.2rem;
+        text-align: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .navbar-toggler {
+        padding: 10px 15px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Touch-friendly buttons */
+.btn-touch {
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    min-height: 50px;
+    border-radius: 10px;
+    margin: 5px;
+}
+
+.btn-touch-lg {
+    padding: 20px 30px;
+    font-size: 1.3rem;
+    min-height: 60px;
+    border-radius: 12px;
+    margin: 10px;
+}
 </style>
 
 <div class="header_section">
@@ -75,6 +120,10 @@ border:1px solid red;
 
 <li class="nav-item active">
 <a class="nav-link" href="{% url 'home' %}">Home</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'listado_sesiones' %}">Sesiones</a>
 </li>
 
 <li class="nav-item">
@@ -143,8 +192,7 @@ border:1px solid red;
          </div>
          <div class="map_main">
             <div class="map-responsive">
-               <iframe src="https://www.google.com/maps/embed/v1/place?key=AIzaSyA0s1a7phLN0iaD6-UE7m4qP-z21pH0eSc&amp;q=Eiffel+Tower+Paris+France" width="600" height="400" frameborder="0" style="border:0; width: 100%;" allowfullscreen=""></iframe>
-            </div>
+<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY_AQUI"></script>            </div>
          </div>
       </div>
       <!-- footer section end -->

@@ -1,19 +1,42 @@
 {% extends "plantilla.html" %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid mt-3">
     <div class="row mb-4">
         <div class="col-12">
-            <h2>Selecciona tus fotos favoritas</h2>
-            <p class="text-muted">Marca las fotos que te gusten y haz clic en "Guardar Selección"</p>
-            <a href="{% url 'listado_fotos' %}" class="btn btn-secondary">← Volver a Galería</a>
+            <h1 class="text-center">Selecciona Tus Fotos</h1>
+            <p class="text-center text-muted lead">Toca las fotos que deseas seleccionar</p>
         </div>
     </div>
+
+    {% if messages %}
+        <div class="row mb-3">
+            <div class="col-12">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 
     <form method="post" action="{% url 'guardarSeleccionFotos' %}" id="frm_seleccion_fotos">
         {% csrf_token %}
         
-        <!-- Agrupar fotos por sesión -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <div class="btn-group-touch" role="group">
+                    <button type="button" class="btn btn-primary btn-lg touch-btn" onclick="seleccionarTodas()">
+                        Seleccionar Todas
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg touch-btn" onclick="deseleccionarTodas()">
+                        Deseleccionar Todas
+                    </button>
+                </div>
+            </div>
+        </div>
+
         {% regroup fotos by sesion as sesiones_con_fotos %}
         
         {% for sesion in sesiones_con_fotos %}
@@ -28,78 +51,185 @@
             <div class="card-body">
                 <div class="row">
                     {% for foto in sesion.list %}
-                    <div class="col-md-3 col-sm-4 col-6 mb-3">
-                        <div class="card h-100">
-                            <img src="{{ foto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                            <div class="card-body text-center p-2">
-                                <h6 class="card-title small">{{ foto.nombre|truncatechars:20 }}</h6>
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+                        <div class="card touch-card h-100" id="card_{{ foto.id }}">
+                            <div class="card-img-container position-relative">
+                                <img src="{{ foto.imagen.url }}" 
+                                     class="card-img-top touch-img" 
+                                     style="height: 180px; object-fit: cover; cursor: pointer;"
+                                     onclick="toggleFoto('{{ foto.id }}')">
                                 
-                                <div class="form-check">
-                                    <input type="checkbox" 
-                                           name="fotos_seleccionadas" 
-                                           value="{{ foto.id }}" 
-                                           class="form-check-input"
-                                           id="foto_{{ foto.id }}">
-                                    <label class="form-check-label" for="foto_{{ foto.id }}">
-                                        Seleccionar
-                                    </label>
+                                <!-- Badge de estado -->
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-success" id="badge_{{ foto.id }}" style="display: none; font-size: 1.2rem; padding: 0.5rem;">
+                                        ✓
+                                    </span>
                                 </div>
+                                
+                                <!-- Checkbox oculto -->
+                                <input type="checkbox" 
+                                       name="fotos_seleccionadas" 
+                                       value="{{ foto.id }}"
+                                       id="foto_{{ foto.id }}"
+                                       class="foto-checkbox"
+                                       style="display: none;">
                             </div>
+                            <div class="card-body text-center p-2">
+                                <h6 class="card-title">{{ foto.nombre|truncatechars:15 }}</h6>
+                                <small class="text-muted">
+                                    {{ foto.sesion.nombre }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning">
+                            <h3>No hay fotos disponibles</h3>
+                            <p>Por favor contacta al administrador</p>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center">
-            <p>No hay fotos disponibles para seleccionar</p>
-        </div>
         {% endfor %}
 
-        {% if fotos %}
-        <div class="row mt-4">
+        <div class="row mt-4 mb-5">
             <div class="col-12 text-center">
-                <button type="submit" class="btn btn-success btn-lg">
-                    Guardar mi Selección de Fotos
+                <button type="submit" class="btn btn-success btn-xl touch-btn-submit" id="btn_guardar" disabled>
+                    Guardar Mi Selección (0 fotos)
                 </button>
             </div>
         </div>
-        {% endif %}
     </form>
 </div>
 
 <style>
-.card {
-    transition: transform 0.2s;
+/* Touch-friendly styles */
+.touch-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 3px solid transparent;
 }
-.card:hover {
+
+.touch-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
-.form-check-input:checked + .form-check-label {
-    color: #28a745;
-    font-weight: bold;
+
+.touch-card.seleccionada {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.3);
+}
+
+.touch-img {
+    border-radius: 8px;
+}
+
+.touch-btn {
+    margin: 0 10px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    min-width: 200px;
+}
+
+.touch-btn-submit {
+    padding: 20px 40px;
+    font-size: 1.5rem;
+    min-width: 300px;
+    border-radius: 12px;
+}
+
+.btn-group-touch {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .touch-btn {
+        margin: 5px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        min-width: 150px;
+    }
+    
+    .touch-btn-submit {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        min-width: 250px;
+    }
+}
+
+/* Disable hover on touch devices */
+@media (hover: none) {
+    .touch-card:hover {
+        transform: none;
+    }
 }
 </style>
+</style>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function(){
     // Contador de fotos seleccionadas
     function actualizarContador() {
         var seleccionadas = $('input[name="fotos_seleccionadas"]:checked').length;
         if (seleccionadas > 0) {
-            $('button[type="submit"]').html('Guardar mi Selección (' + seleccionadas + ' fotos)');
+            $('#btn_guardar').html('Guardar Mi Selección (' + seleccionadas + ' fotos)');
+            $('#btn_guardar').prop('disabled', false);
         } else {
-            $('button[type="submit"]').html('Guardar mi Selección de Fotos');
+            $('#btn_guardar').html('Guardar Mi Selección (0 fotos)');
+            $('#btn_guardar').prop('disabled', true);
         }
     }
     
-    // Actualizar contador cuando cambia la selección
-    $('input[name="fotos_seleccionadas"]').change(function() {
+    // Función para alternar selección de foto
+    window.toggleFoto = function(fotoId) {
+        var checkbox = $('#foto_' + fotoId);
+        var card = $('#card_' + fotoId);
+        var badge = $('#badge_' + fotoId);
+        
+        checkbox.prop('checked', !checkbox.prop('checked'));
+        
+        if (checkbox.prop('checked')) {
+            card.addClass('seleccionada');
+            badge.show();
+        } else {
+            card.removeClass('seleccionada');
+            badge.hide();
+        }
+        
         actualizarContador();
-    });
+    };
     
-    // Inicializar contador
+    // Botones de seleccionar todas/deseleccionar todas
+    window.seleccionarTodas = function() {
+        $('.foto-checkbox').each(function() {
+            var fotoId = $(this).val();
+            $(this).prop('checked', true);
+            $('#card_' + fotoId).addClass('seleccionada');
+            $('#badge_' + fotoId).show();
+        });
+        actualizarContador();
+    };
+    
+    window.deseleccionarTodas = function() {
+        $('.foto-checkbox').each(function() {
+            var fotoId = $(this).val();
+            $(this).prop('checked', false);
+            $('#card_' + fotoId).removeClass('seleccionada');
+            $('#badge_' + fotoId).hide();
+        });
+        actualizarContador();
+    };
+    
+    // Inicializar
     actualizarContador();
 });
 </script>

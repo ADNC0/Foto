@@ -8,9 +8,23 @@
             <p class="text-muted">
                 <strong>Cliente:</strong> {{ seleccion.cliente.nombre }}<br>
                 <strong>Email de envío:</strong> {{ seleccion.email_cliente }}<br>
-                <strong>Fecha:</strong> {{ seleccion.fecha|date:"d/m/Y H:i" }}
+                <strong>Fecha:</strong> {{ seleccion.fecha|date:"d/m/Y H:i" }}<br>
+                <strong>Estado:</strong> 
+                <span class="badge 
+                    {% if seleccion.estado == 'PENDIENTE' %}bg-warning
+                    {% elif seleccion.estado == 'ENVIADO' %}bg-success
+                    {% elif seleccion.estado == 'CANCELADO' %}bg-danger{% endif %}">
+                    {{ seleccion.get_estado_display }}
+                </span>
             </p>
-            <a href="{% url 'mis_selecciones' %}" class="btn btn-secondary">← Volver a Mis Selecciones</a>
+            <div class="mb-3">
+                <a href="{% url 'mis_selecciones' %}" class="btn btn-secondary">← Volver a Mis Selecciones</a>
+                {% if seleccion.estado == 'PENDIENTE' %}
+                <a href="{% url 'editar_seleccion_fotos' seleccion.id %}" class="btn btn-warning">
+                    Editar Selección
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 

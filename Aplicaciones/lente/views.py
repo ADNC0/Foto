@@ -476,6 +476,117 @@ def verFotosSeleccionadas(request, seleccion_id):
         "fotos": fotos_seleccionadas
     })
 
+def editarSeleccionFotos(request, seleccion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo CLIENTES pueden editar sus fotos
+    if request.session.get('rol') != 'CLIENTE':
+        messages.error(request, "Esta sección es solo para clientes")
+        return redirect('home')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=seleccion_id)
+    
+    # Verificar que la selección pertenezca al cliente actual
+    if seleccion.cliente.id != request.session['usuario_id']:
+        messages.error(request, "No puedes editar esta selección")
+        return redirect('mis_selecciones')
+    
+    # Solo se puede editar si está pendiente
+    if seleccion.estado != 'PENDIENTE':
+        messages.error(request, "Solo se pueden editar selecciones pendientes")
+        return redirect('ver_fotos_seleccionadas', seleccion_id=seleccion_id)
+    
+    if request.method == 'POST':
+        fotos_seleccionadas = request.POST.getlist('fotos_seleccionadas')
+        
+        if not fotos_seleccionadas:
+            messages.warning(request, "Debes seleccionar al menos una foto")
+            return redirect('editar_seleccion_fotos', seleccion_id=seleccion_id)
+        
+        # Eliminar selecciones anteriores
+        FotoSeleccionada.objects.filter(seleccion=seleccion).delete()
+        
+        # Guardar nuevas selecciones
+        for foto_id in fotos_seleccionadas:
+            foto = Foto.objects.get(id=foto_id)
+            FotoSeleccionada.objects.create(
+                seleccion=seleccion,
+                foto=foto
+            )
+        
+        messages.success(request, f"¡Perfecto! Has actualizado tu selección con {len(fotos_seleccionadas)} fotos.")
+        return redirect('ver_fotos_seleccionadas', seleccion_id=seleccion_id)
+    
+    # Obtener todas las fotos disponibles
+    todas_fotos = Foto.objects.all()
+    
+    # Obtener IDs de las fotos ya seleccionadas
+    fotos_seleccionadas_ids = [fs.foto.id for fs in FotoSeleccionada.objects.filter(seleccion=seleccion)]
+    
+    return render(request, "FotoSeleccionada/editarSeleccionFotos.html", {
+        "seleccion": seleccion,
+        "fotos": todas_fotos,
+        "fotos_seleccionadas_ids": fotos_seleccionadas_ids
+    })
+
+def asignarFotosCliente(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo ADMIN puede asignar fotos
+    if request.session.get('rol') != 'ADMIN':
+        messages.error(request, "No tienes permisos para asignar fotos")
+        return redirect('home')
+    
+    clientes = Usuario.objects.filter(rol='CLIENTE')
+    fotos = Foto.objects.all()
+    
+    return render(request, "FotoSeleccionada/asignarFotosCliente.html", {
+        "clientes": clientes,
+        "fotos": fotos
+    })
+
+def guardarAsignacionFotos(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo ADMIN puede asignar fotos
+    if request.session.get('rol') != 'ADMIN':
+        messages.error(request, "No tienes permisos para asignar fotos")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        cliente_id = request.POST.get('cliente')
+        email_destino = request.POST.get('email_destino')
+        fotos_seleccionadas = request.POST.getlist('fotos_seleccionadas')
+        
+        if not fotos_seleccionadas:
+            messages.error(request, "Debes seleccionar al menos una foto")
+            return redirect('asignar_fotos_cliente')
+        
+        cliente = Usuario.objects.get(id=cliente_id)
+        
+        # Crear nueva selección para el cliente
+        seleccion = SeleccionCliente.objects.create(
+            cliente=cliente,
+            email_cliente=email_destino,
+            estado='PENDIENTE'
+        )
+        
+        # Guardar las fotos seleccionadas
+        for foto_id in fotos_seleccionadas:
+            foto = Foto.objects.get(id=foto_id)
+            FotoSeleccionada.objects.create(
+                seleccion=seleccion,
+                foto=foto
+            )
+        
+        messages.success(request, f"Se han asignado {len(fotos_seleccionadas)} fotos al cliente {cliente.nombre}")
+        return redirect('listado_selecciones')
+    
+    return redirect('asignar_fotos_cliente')
+
 def asignarEmailSeleccion(request, seleccion_id):
     if 'usuario_id' not in request.session:
         return redirect('login')
@@ -530,7 +641,7 @@ Hola, {seleccion.email_cliente}
 Te enviamos las fotos que has seleccionado de nuestra galería.
 
 Cliente: {seleccion.cliente.nombre}
-Fecha de selección: {seleccion.fecha|date:"d/m/Y H:i"}
+Fecha de selección: {seleccion.fecha.strftime("%d/%m/%Y %H:%M")}
 Total de fotos: {fotos_seleccionadas.count()}
 
 Esperamos que disfrutes tus fotos seleccionadas.
@@ -541,7 +652,7 @@ Arcano Fotografía
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[seleccion.email_cliente],
         )
-        
+            
         # Adjuntar las fotos
         for foto_seleccionada in fotos_seleccionadas:
             foto_path = foto_seleccionada.foto.imagen.path
@@ -550,14 +661,14 @@ Arcano Fotografía
         
         # Enviar email
         email.send()
-        
+            
         # Actualizar estado y fecha de envío
         seleccion.estado = 'ENVIADO'
         seleccion.fecha_envio = timezone.now()
         seleccion.save()
-        
+            
         messages.success(request, f"¡Email enviado exitosamente a {seleccion.email_cliente} con {fotos_seleccionadas.count()} fotos!")
-        
+            
     except Exception as e:
         messages.error(request, f"Error al enviar email: {str(e)}")
     

@@ -1,0 +1,213 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Editar Mi Selección de Fotos</h2>
+            <p class="text-muted">
+                <strong>Cliente:</strong> {{ seleccion.cliente.nombre }}<br>
+                <strong>Email de envío:</strong> {{ seleccion.email_cliente }}<br>
+                <strong>Estado:</strong> 
+                <span class="badge bg-warning">{{ seleccion.get_estado_display }}</span>
+            </p>
+            <div class="mb-3">
+                <a href="{% url 'ver_fotos_seleccionadas' seleccion.id %}" class="btn btn-secondary">← Volver a Mis Fotos</a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="row mb-3">
+            <div class="col-12">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="alert alert-info">
+        <h5>Instrucciones:</h5>
+        <ul>
+            <li><strong>Haz clic en cualquier foto</strong> para seleccionarla o deseleccionarla</li>
+            <li>También puedes usar los <strong>checkbox</strong> en la esquina superior izquierda</li>
+            <li>Las fotos seleccionadas tienen <strong>borde verde</strong> y fondo verde claro</li>
+            <li>Debes seleccionar al menos una foto</li>
+            <li>Solo puedes editar mientras la selección esté "Pendiente"</li>
+        </ul>
+    </div>
+
+    <form method="post" action="{% url 'editar_seleccion_fotos' seleccion.id %}" id="frm_editar_seleccion">
+        {% csrf_token %}
+        
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="seleccionarTodas()">
+                        Seleccionar Todas
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="deseleccionarTodas()">
+                        Deseleccionar Todas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for foto in fotos %}
+            <div class="col-md-3 col-sm-4 col-6 mb-3">
+                <div class="card h-100 
+                    {% if foto.id in fotos_seleccionadas_ids %}border-success{% endif %}">
+                    <div class="card-img-container position-relative">
+                        <img src="{{ foto.imagen.url }}" 
+                             class="card-img-top foto-clicable" 
+                             style="height: 200px; object-fit: cover; cursor: pointer;"
+                             onclick="$('#foto_{{ foto.id }}').click();">
+                        
+                        <!-- Checkbox visible -->
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" 
+                                       name="fotos_seleccionadas" 
+                                       value="{{ foto.id }}"
+                                       id="foto_{{ foto.id }}"
+                                       class="form-check-input foto-checkbox"
+                                       style="width: 20px; height: 20px; cursor: pointer;"
+                                       {% if foto.id in fotos_seleccionadas_ids %}checked{% endif %}>
+                            </div>
+                        </div>
+                        
+                        <!-- Badge de estado -->
+                        {% if foto.id in fotos_seleccionadas_ids %}
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-success">Seleccionado</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body text-center p-2">
+                        <h6 class="card-title small">{{ foto.nombre|truncatechars:20 }}</h6>
+                        <small class="text-muted">
+                            Sesión: {{ foto.sesion.nombre }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="alert alert-warning">
+                    <h4>No hay fotos disponibles</h4>
+                    <p>No hay fotos en la galería para seleccionar</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-success btn-lg" id="btn_guardar">
+                    Guardar Mi Selección
+                </button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="{% url 'ver_fotos_seleccionadas' seleccion.id %}" class="btn btn-secondary btn-lg">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.foto-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.card-img-container {
+    height: 200px;
+    overflow: hidden;
+}
+
+.border-success {
+    border-width: 3px !important;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.position-absolute .form-check {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.foto-clicable:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.card.border-success {
+    background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    // Contador de fotos seleccionadas
+    function actualizarContador() {
+        var seleccionadas = $('input[name="fotos_seleccionadas"]:checked').length;
+        if (seleccionadas > 0) {
+            $('#btn_guardar').html('Guardar Mi Selección (' + seleccionadas + ' fotos)');
+            $('#btn_guardar').prop('disabled', false);
+        } else {
+            $('#btn_guardar').html('Guardar Mi Selección');
+            $('#btn_guardar').prop('disabled', true);
+        }
+    }
+    
+    // Actualizar contador cuando cambia la selección
+    $('input[name="fotos_seleccionadas"]').change(function() {
+        actualizarContador();
+        
+        // Actualizar visual de la tarjeta
+        var card = $(this).closest('.card');
+        if ($(this).is(':checked')) {
+            card.addClass('border-success');
+            card.find('.badge').remove();
+            card.find('.position-absolute.top-0.end-0').html('<span class="badge bg-success">✓</span>');
+        } else {
+            card.removeClass('border-success');
+            card.find('.badge').remove();
+        }
+    });
+    
+    // Inicializar contador
+    actualizarContador();
+});
+
+function seleccionarTodas() {
+    $('input[name="fotos_seleccionadas"]').prop('checked', true);
+    $('input[name="fotos_seleccionadas"]').trigger('change');
+}
+
+function deseleccionarTodas() {
+    $('input[name="fotos_seleccionadas"]').prop('checked', false);
+    $('input[name="fotos_seleccionadas"]').trigger('change');
+}
+
+</script>
+
+{% endblock %}

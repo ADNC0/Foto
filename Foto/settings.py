@@ -127,12 +127,23 @@ DEBUG = True
 # CONFIGURACION PARA PRODUCCION
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# CONFIGURACION EMAIL (similar a nodemailer pero para Django)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465  # Cambia el puerto a 465 para SSL
-EMAIL_USE_TLS = False  # Desactiva TLS si usas el puerto 465
-EMAIL_USE_SSL = True  # Usa SSL en lugar de TLS
+EMAIL_PORT = 587  # Puerto estándar para Gmail con TLS
+EMAIL_USE_TLS = True  # Usar TLS (más seguro que SSL)
+EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'abraham.nacimba5565@utc.edu.ec'
-EMAIL_HOST_PASSWORD = 'talo btem bset ahrh'
+EMAIL_HOST_PASSWORD = ''
 
-DEFAULT_FROM_EMAIL = 'abraham.nacimba5565@utc.edu.ec'
+# Configuraciones adicionales para mejor entregabilidad
+DEFAULT_FROM_EMAIL = 'Arcano Fotografía <abraham.nacimba5565@utc.edu.ec>'
+EMAIL_SUBJECT_PREFIX = '[Arcano Fotografía] '
+SERVER_EMAIL = 'abraham.nacimba5565@utc.edu.ec'
+
+# Timeout y reintentos
+EMAIL_TIMEOUT = 30
+
+# Para desarrollo (comentar en producción)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

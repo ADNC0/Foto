@@ -42,5 +42,6 @@ urlpatterns = [
     path('asignar_email_seleccion/<int:seleccion_id>/',views.asignarEmailSeleccion,name='asignar_email_seleccion'),
     path('enviar_seleccion/<int:seleccion_id>/',views.enviarSeleccion,name='enviarSeleccion'),
     path('cancelar_seleccion/<int:seleccion_id>/',views.cancelarSeleccion,name='cancelarSeleccion'),
+    path('editar_seleccion_fotos/<int:seleccion_id>/',views.editarSeleccionFotos,name='editar_seleccion_fotos'),
     
 ]
