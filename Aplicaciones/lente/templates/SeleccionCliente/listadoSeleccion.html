@@ -8,18 +8,6 @@
         </div>
     </div>
 
-    {% if messages %}
-        <div class="row mb-3">
-            <div class="col-12 text-center">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-
     <div class="row mb-3">
         <div class="col-12 text-center">
             <a href="{% url 'nuevaSeleccion' %}" class="btn btn-success">
@@ -121,30 +109,5 @@
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
-
-<script>
-$(document).ready(function(){
-    $('#tbl-selecciones').DataTable({
-        dom: 'Bfrtip',
-        buttons: [
-            'copy',
-            'excelHtml5',
-            'csvHtml5',
-            'pdfHtml5',
-            'print'
-        ],
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json'
-        }
-    });
-});
-</script>
 
 {% endblock %}

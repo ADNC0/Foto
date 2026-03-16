@@ -18,34 +18,29 @@
 <!-- RESPONSIVE -->
 <link rel="stylesheet" href="{% static 'plantilla/Profusion-1.0.0/css/responsive.css' %}">
 
-<!-- FAVICON -->
-<link rel="icon" href="{% static 'plantilla/Profusion-1.0.0/images/fevicon.png' %}" type="image/gif">
-
 <!-- SCROLLBAR -->
 <link rel="stylesheet" href="{% static 'plantilla/Profusion-1.0.0/css/jquery.mCustomScrollbar.min.css' %}">
-
-<!-- FONTAWESOME -->
-<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-
-<!-- GOOGLE FONTS -->
-<link href="https://fonts.googleapis.com/css?family=Poppins:400,700|Roboto:400,700&display=swap" rel="stylesheet">
 
 <!-- OWL -->
 <link rel="stylesheet" href="{% static 'plantilla/Profusion-1.0.0/css/owl.carousel.min.css' %}">
 <link rel="stylesheet" href="{% static 'plantilla/Profusion-1.0.0/css/owl.theme.default.min.css' %}">
 
-<!-- FANCYBOX -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
+<!-- iziToast -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+
+<!-- GOOGLE FONTS -->
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,700|Roboto:400,700&display=swap" rel="stylesheet">
 
 <!-- DATATABLES -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
 
-</head>
-
-<body>
+<!-- FAVICON -->
+<link rel="icon" href="{% static 'plantilla/Profusion-1.0.0/images/fevicon.png' %}" type="image/png">
 
 <style>
+
 label.error{
 color:red;
 font-weight:bold;
@@ -55,59 +50,33 @@ input.error{
 border:1px solid red;
 }
 
-/* Touch-friendly navigation */
 .navbar-nav .nav-link {
-    padding: 15px 20px !important;
-    font-size: 1.1rem;
-    margin: 0 5px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+padding: 15px 20px !important;
+font-size: 1.1rem;
+margin: 0 5px;
+border-radius: 8px;
+transition: all 0.3s ease;
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: #f8f9fa;
-    transform: translateY(-2px);
+background-color: #f8f9fa;
+transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
-    .navbar-nav .nav-link {
-        padding: 20px !important;
-        font-size: 1.2rem;
-        text-align: center;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    .navbar-toggler {
-        padding: 10px 15px;
-        font-size: 1.5rem;
-    }
-}
-
-/* Touch-friendly buttons */
-.btn-touch {
-    padding: 15px 25px;
-    font-size: 1.1rem;
-    min-height: 50px;
-    border-radius: 10px;
-    margin: 5px;
-}
-
-.btn-touch-lg {
-    padding: 20px 30px;
-    font-size: 1.3rem;
-    min-height: 60px;
-    border-radius: 12px;
-    margin: 10px;
-}
 </style>
 
+</head>
+
+<body>
+
+<!-- HEADER -->
 <div class="header_section">
 <div class="container-fluid">
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
-<a class="navbar-brand" href="#">
-<img src="{% static 'plantilla/Profusion-1.0.0/images/logo.png' %}">
+<a class="navbar-brand" href="{% url 'home' %}">
+<img src="{% static 'plantilla/Profusion-1.0.0/images/logo.png' %}" width="120">
 </a>
 
 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -118,7 +87,7 @@ border:1px solid red;
 
 <ul class="navbar-nav mr-auto">
 
-<li class="nav-item active">
+<li class="nav-item">
 <a class="nav-link" href="{% url 'home' %}">Home</a>
 </li>
 
@@ -142,23 +111,24 @@ border:1px solid red;
 </li>
 {% endif %}
 
+<li class="nav-item">
+<a class="nav-link text-danger" href="{% url 'logout' %}">
+Cerrar sesión <i class="fa fa-sign-out"></i>
+{{ request.session.usuario_nombre }} ({{ request.session.rol }})
+</a>
+</li>
+
 </ul>
 
-<form class="form-inline my-2 my-lg-0">
-<div class="user_icon">
-<a href="#"><i class="fa fa-user"></i></a>
+<div class="form-inline">
+<div class="user_icon mr-3">
+<i class="fa fa-user"></i>
 </div>
 
 <div class="user_icon">
-<a href="#"><i class="fa fa-search"></i></a>
+<i class="fa fa-search"></i>
 </div>
-</form>
-
-<li class="nav-item">
-    <a class="nav-link text-danger" href="{% url 'logout' %}">
-        Cerrar sesión <i class="fa fa-sign-out"></i> {{ request.session.usuario_nombre }} ({{ request.session.rol }})
-    </a>
-</li>
+</div>
 
 </div>
 </nav>
@@ -166,89 +136,177 @@ border:1px solid red;
 </div>
 </div>
 
+
+<!-- CONTENIDO DE LAS VISTAS -->
 {% block body %}
 {% endblock %}
-    <!-- footer section start -->
-      <div class="footer_section margin_top90">
-         <div class="location_bg">
-            <div class="container">
-               <div class="location_main">
-                  <ul>
-                     <li>
-                        <a href="#"><img src="images/map-icon.png">
-                        <span class="padding_15">Location</span></a>
-                     </li>
-                     <li>
-                        <a href="#"><img src="images/call-icon.png">
-                        <span class="padding_15">Call +01 1234567890</span></a>
-                     </li>
-                     <li>
-                        <a href="#"><img src="images/mail-icon.png">
-                        <span class="padding_15">demo@gmail.com</span></a>
-                     </li>
-                  </ul>
-               </div>
-            </div>
-         </div>
-         <div class="map_main">
-            <div class="map-responsive">
-<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY_AQUI"></script>            </div>
-         </div>
-      </div>
-      <!-- footer section end -->
+
+
+<!-- FOOTER -->
+<div class="footer_section margin_top90">
+<div class="location_bg">
+<div class="container">
+<div class="location_main">
+
+<ul>
+
+<li>
+<a href="#">
+<img src="{% static 'plantilla/Profusion-1.0.0/images/map-icon.png' %}">
+<span class="padding_15">Location</span>
+</a>
+</li>
+
+<li>
+<a href="#">
+<img src="{% static 'plantilla/Profusion-1.0.0/images/call-icon.png' %}">
+<span class="padding_15">Call +01 1234567890</span>
+</a>
+</li>
+
+<li>
+<a href="#">
+<img src="{% static 'plantilla/Profusion-1.0.0/images/mail-icon.png' %}">
+<span class="padding_15">demo@gmail.com</span>
+</a>
+</li>
+
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
 
 <div class="copyright_section">
 <div class="container">
 <p class="copyright_text">
 © 2020 All Rights Reserved.
 Design by <a href="https://html.design">Free html Templates</a>
-Distribution by <a href="https://themewagon.com/">Themewagon</a>
 </p>
 </div>
 </div>
 
+
 <!-- JS -->
 
 <script src="{% static 'plantilla/Profusion-1.0.0/js/jquery.min.js' %}"></script>
+
 <script src="{% static 'plantilla/Profusion-1.0.0/js/popper.min.js' %}"></script>
+
 <script src="{% static 'plantilla/Profusion-1.0.0/js/bootstrap.bundle.min.js' %}"></script>
+
 <script src="{% static 'plantilla/Profusion-1.0.0/js/plugin.js' %}"></script>
+
 <script src="{% static 'plantilla/Profusion-1.0.0/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
-<script src="{% static 'plantilla/Profusion-1.0.0/js/custom.js' %}"></script>
+
 <script src="{% static 'plantilla/Profusion-1.0.0/js/owl.carousel.js' %}"></script>
 
-<script>
-$('.owl-carousel').owlCarousel({
-loop:true,
-margin:35,
-nav:true,
-center:true,
-responsive:{
-0:{items:1},
-575:{items:1},
-768:{items:3},
-1000:{items:3}
-}
-})
-</script>
-<!-- restricciones -->
-<script>
-      document.getElementById("imagen").addEventListener("change", function(){
-      let archivo = this.files[0];
-      if(!archivo) return;
-      let extensionesPermitidas = [
-      "jpg","jpeg","png","gif","bmp","tiff","tif","raw","webp",
-      "heif","heic","svg","psd","dng","cr2","cr3","nef","arw",
-      "orf","raf","sr2","srf","pef","rw2","x3f","3fr","erf",
-      "mef","mos","iiq"
-      ];
+<script src="{% static 'plantilla/Profusion-1.0.0/js/custom.js' %}"></script>
 
-      let extension = archivo.name.split('.').pop().toLowerCase();
-      if(!extensionesPermitidas.includes(extension)){
-      alert("Solo se permiten archivos de imagen.");
-      this.value = "";
-      }
-      });
+<!-- iziToast -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
+
+<!-- DATATABLES -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+//<![CDATA[
+// Configuración global de iziToast
+iziToast.settings({
+    timeout: 3000,
+    resetOnHover: true,
+    icon: '',
+    transitionIn: 'fadeInDown',
+    transitionOut: 'fadeOutUp',
+    position: 'topRight',
+    progressBar: true,
+    close: true,
+    closeOnClick: true,
+    pauseOnHover: true
+});
+
+function mostrarMensajesDjango() {
+    {% if messages %}
+        {% for message in messages %}
+            console.log('Procesando mensaje:', '{{ message.tags }}', '{{ message|safe }}');
+            
+            var tags = '{{ message.tags }}';
+            var titleText = '';
+            var bgColor = '';
+            
+            if (tags == "error") {
+                titleText = 'Error';
+                bgColor = '#f44336';
+            } else if (tags == "success") {
+                titleText = 'Éxito';
+                bgColor = '#4caf50';
+            } else if (tags == "warning") {
+                titleText = 'Advertencia';
+                bgColor = '#ff9800';
+            } else if (tags == "info") {
+                titleText = 'Información';
+                bgColor = '#2196f3';
+            } else {
+                titleText = 'Mensaje';
+                bgColor = '#607d8b';
+            }
+            
+            // Usar la versión correcta de iziToast
+            if (typeof iziToast !== 'undefined') {
+                iziToast[tags]({
+                    title: titleText,
+                    message: '{{ message|safe }}',
+                    backgroundColor: bgColor
+                });
+                console.log('Notificación mostrada:', tags, titleText);
+            } else {
+                console.error('iziToast no está definido');
+            }
+        {% endfor %}
+    {% endif %}
+}
+
+// Ejecutar cuando el documento esté listo
+$(document).ready(function() {
+    console.log('Documento listo, mostrando mensajes...');
+    mostrarMensajesDjango();
+    
+    // Inicializar todas las tablas con DataTables
+    $('table').each(function() {
+        if (!$(this).hasClass('no-datatables')) {
+            $(this).DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json'
+                },
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    'pageLength',
+                    {
+                        extend: 'excel',
+                        text: 'Exportar Excel',
+                        className: 'btn btn-success btn-sm'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'Exportar PDF', 
+                        className: 'btn btn-danger btn-sm'
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        className: 'btn btn-info btn-sm'
+                    }
+                ]
+            });
+        }
+    });
+});
+//]]>
 </script>
 
 </body>
