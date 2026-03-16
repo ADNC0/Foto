@@ -134,13 +134,13 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Puerto estándar para Gmail con TLS
 EMAIL_USE_TLS = True  # Usar TLS (más seguro que SSL)
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'abraham.nacimba5565@utc.edu.ec'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'poner tu correo aca'
+EMAIL_HOST_PASSWORD = 'poner tu contraseña aca'
 
 # Configuraciones adicionales para mejor entregabilidad
-DEFAULT_FROM_EMAIL = 'Arcano Fotografía <abraham.nacimba5565@utc.edu.ec>'
+DEFAULT_FROM_EMAIL = 'Arcano Fotografía <poner tu correo aca>'
 EMAIL_SUBJECT_PREFIX = '[Arcano Fotografía] '
-SERVER_EMAIL = 'abraham.nacimba5565@utc.edu.ec'
+SERVER_EMAIL = 'poner tu correo aca'
 
 # Timeout y reintentos
 EMAIL_TIMEOUT = 30
