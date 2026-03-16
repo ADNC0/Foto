@@ -11,40 +11,72 @@
     {% if request.session.rol == 'ADMIN' %}
     <div class="row mb-3">
         <div class="col-12 text-center">
-            <a href="{% url 'nuevaFoto' %}" class="btn btn-success">
+            <a href="{% url 'nuevaFoto' %}" class="btn btn-success me-2">
                 Subir Nuevas Fotos
+            </a>
+            <a href="{% url 'eliminarTodasLasFotos' %}" 
+               onclick="return confirm('¿Eliminar TODAS las fotos? Esta acción no se puede deshacer.')" 
+               class="btn btn-danger">
+                Eliminar Todas las Fotos
             </a>
         </div>
     </div>
     {% endif %}
 
-    <div class="row">
-        {% for foto in fotos %}
-        <div class="col-md-3 col-sm-4 col-6 mb-3">
-            <div class="card h-100">
-                <img src="{{ foto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h6 class="card-title">{{ foto.nombre }}</h6>
-                    <small class="text-muted">Sesión: {{ foto.sesion.nombre }}</small>
-                    
-                    {% if request.session.rol == 'ADMIN' %}
-                    <div class="mt-2">
-                        <a href="{% url 'eliminarFoto' foto.id %}" 
-                           onclick="return confirm('¿Eliminar esta foto?')" 
-                           class="btn btn-sm btn-danger">
-                            Eliminar
-                        </a>
+    <!-- Agrupar fotos por sesión -->
+    {% regroup fotos by sesion as sesiones_con_fotos %}
+    
+    {% for sesion in sesiones_con_fotos %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                📁 {{ sesion.grouper.nombre }}
+                <span class="badge bg-secondary">{{ sesion.list|length }} fotos</span>
+            </h4>
+            <a href="{% url 'fotos_por_sesion' sesion.grouper.id %}" class="btn btn-primary btn-sm">
+                Administrar Carpeta
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                {% for foto in sesion.list|slice:":8" %}
+                <div class="col-md-3 col-sm-4 col-6 mb-3">
+                    <div class="card h-100">
+                        <img src="{{ foto.imagen.url }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                        <div class="card-body text-center p-2">
+                            <h6 class="card-title small">{{ foto.nombre|truncatechars:20 }}</h6>
+                            
+                            {% if request.session.rol == 'ADMIN' %}
+                            <div class="mt-1">
+                                <a href="{% url 'eliminarFoto' foto.id %}" 
+                                   onclick="return confirm('¿Eliminar esta foto?')" 
+                                   class="btn btn-sm btn-danger">
+                                    Eliminar
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% endif %}
                 </div>
+                {% endfor %}
+                
+                {% if sesion.list|length > 8 %}
+                <div class="col-12 text-center mt-3">
+                    <p class="text-muted">... y {{ sesion.list|length|add:"-8" }} fotos más</p>
+                    <a href="{% url 'fotos_por_sesion' sesion.grouper.id %}" class="btn btn-outline-primary">
+                        Ver todas las fotos de esta sesión
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center">
-            <p>No hay fotos cargadas</p>
-        </div>
-        {% endfor %}
     </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <p>No hay fotos cargadas</p>
+    </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

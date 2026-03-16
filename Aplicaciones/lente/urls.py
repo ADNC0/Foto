@@ -24,5 +24,8 @@ urlpatterns = [
     path('guardarFoto/',views.guardarFoto,name='guardarFoto'),
     path('listado_fotos/',views.listado_fotos,name='listado_fotos'),
     path('eliminarFoto/<int:id>/',views.eliminarFoto,name='eliminarFoto'),
+    path('eliminarTodasLasFotos/',views.eliminarTodasLasFotos,name='eliminarTodasLasFotos'),
+    path('fotos_por_sesion/<int:sesion_id>/',views.fotosPorSesion,name='fotos_por_sesion'),
+    path('eliminar_fotos_sesion/<int:sesion_id>/',views.eliminarFotosSesion,name='eliminar_fotos_sesion'),
     
 ]

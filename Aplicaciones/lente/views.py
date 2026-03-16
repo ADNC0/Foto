@@ -19,6 +19,7 @@ def login(request):
 
             request.session["usuario_id"] = usuario.id
             request.session["rol"] = usuario.rol
+            request.session["usuario_nombre"] = usuario.nombre
 
             return redirect("home")
 
@@ -243,3 +244,46 @@ def eliminarFoto(request, id):
     foto.delete()
     messages.success(request, "Foto eliminada correctamente")
     return redirect('listado_fotos')
+
+def eliminarTodasLasFotos(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    if request.session.get('rol') != 'ADMIN':
+        messages.error(request, "No tienes permisos para eliminar fotos")
+        return redirect('listado_fotos')
+    
+    Foto.objects.all().delete()
+    messages.success(request, "Todas las fotos han sido eliminadas")
+    return redirect('listado_fotos')
+
+def fotosPorSesion(request, sesion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    sesion = get_object_or_404(SesionFotos, id=sesion_id)
+    fotos = Foto.objects.filter(sesion=sesion)
+    
+    return render(request, "Foto/fotosPorSesion.html", {
+        'sesion': sesion,
+        'fotos': fotos
+    })
+
+def eliminarFotosSesion(request, sesion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    if request.session.get('rol') != 'ADMIN':
+        messages.error(request, "No tienes permisos para eliminar fotos")
+        return redirect('listado_fotos')
+    
+    if request.method == 'POST':
+        fotos_a_eliminar = request.POST.getlist('fotos_seleccionadas')
+        
+        if fotos_a_eliminar:
+            Foto.objects.filter(id__in=fotos_a_eliminar).delete()
+            messages.success(request, f"Se eliminaron {len(fotos_a_eliminar)} fotos")
+        else:
+            messages.warning(request, "No seleccionaste ninguna foto")
+    
+    return redirect('fotos_por_sesion', sesion_id=sesion_id)

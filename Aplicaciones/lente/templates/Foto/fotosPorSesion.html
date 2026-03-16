@@ -1,0 +1,97 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Fotos de la sesión: {{ sesion.nombre }}</h2>
+            <a href="{% url 'listado_fotos' %}" class="btn btn-secondary">
+                ← Volver a todas las fotos
+            </a>
+        </div>
+    </div>
+
+    {% if request.session.rol == 'ADMIN' %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <form method="post" action="{% url 'eliminar_fotos_sesion' sesion.id %}">
+                {% csrf_token %}
+                
+                <div class="row">
+                    {% for foto in fotos %}
+                    <div class="col-md-3 col-sm-4 col-6 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ foto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">{{ foto.nombre }}</h6>
+                                
+                                <div class="form-check">
+                                    <input type="checkbox" 
+                                           name="fotos_seleccionadas" 
+                                           value="{{ foto.id }}" 
+                                           class="form-check-input"
+                                           id="foto_{{ foto.id }}">
+                                    <label class="form-check-label" for="foto_{{ foto.id }}">
+                                        Seleccionar
+                                    </label>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <a href="{% url 'eliminarFoto' foto.id %}" 
+                                       onclick="return confirm('¿Eliminar esta foto?')" 
+                                       class="btn btn-sm btn-danger">
+                                        Eliminar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center">
+                        <p>No hay fotos en esta sesión</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if fotos %}
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button type="submit" 
+                                onclick="return confirm('¿Eliminar las fotos seleccionadas?')" 
+                                class="btn btn-warning">
+                            Eliminar Seleccionadas
+                        </button>
+                        
+                        <a href="{% url 'eliminarTodasLasFotos' %}" 
+                           onclick="return confirm('¿Eliminar TODAS las fotos de esta sesión? Esta acción no se puede deshacer.')" 
+                           class="btn btn-danger">
+                            Eliminar Todas las Fotos de la Sesión
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <!-- Vista para CLIENTE - solo ver fotos -->
+    <div class="row">
+        {% for foto in fotos %}
+        <div class="col-md-3 col-sm-4 col-6 mb-3">
+            <div class="card h-100">
+                <img src="{{ foto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h6 class="card-title">{{ foto.nombre }}</h6>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No hay fotos en esta sesión</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
