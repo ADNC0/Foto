@@ -33,6 +33,36 @@
                     <div class="invalid-feedback" id="email_cliente-error"></div>
                 </div>
 
+                <div class="form-group mb-3">
+                    <label for="estado" class="form-label">Estado de la selección:</label>
+                    <select name="estado" id="estado" class="form-control" required>
+                        <option value="">--Seleccione un estado--</option>
+                        <option value="PENDIENTE" 
+                                {% if seleccionEditar.estado == 'PENDIENTE' %}selected{% endif %}>
+                            Pendiente de envío
+                        </option>
+                        <option value="ENVIADO" 
+                                {% if seleccionEditar.estado == 'ENVIADO' %}selected{% endif %}>
+                            Enviado correctamente
+                        </option>
+                        <option value="CANCELADO" 
+                                {% if seleccionEditar.estado == 'CANCELADO' %}selected{% endif %}>
+                            Cancelado por cliente
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" id="estado-error"></div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="notas_cancelacion" class="form-label">Notas de cancelación (si aplica):</label>
+                    <textarea name="notas_cancelacion" id="notas_cancelacion" 
+                              class="form-control" rows="3" 
+                              placeholder="Notas sobre la cancelación o cualquier observación importante">{{ seleccionEditar.notas_cancelacion|default:'' }}</textarea>
+                    <small class="form-text text-muted">
+                        Usa este campo para notas importantes, especialmente si el estado es "Cancelado"
+                    </small>
+                </div>
+
                 <div class="text-center">
                     <button type="submit" class="btn btn-warning">
                         Actualizar Selección
@@ -63,7 +93,8 @@ input.error, select.error{
 $("#frm_editar_seleccion").validate({
     rules:{
         cliente:{required:true},
-        email_cliente:{required:true,email:true}
+        email_cliente:{required:true,email:true},
+        estado:{required:true}
     },
     messages:{
         cliente:{
@@ -72,6 +103,9 @@ $("#frm_editar_seleccion").validate({
         email_cliente:{
             required:"El correo electrónico es obligatorio",
             email:"Ingrese un correo válido"
+        },
+        estado:{
+            required:"Debe seleccionar un estado"
         }
     },
     errorClass:"error-message",

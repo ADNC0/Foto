@@ -316,7 +316,8 @@ def guardarSeleccion(request):
         
         SeleccionCliente.objects.create(
             cliente=cliente,
-            email_cliente=email_cliente
+            email_cliente=email_cliente,
+            estado='PENDIENTE'
         )
         
         messages.success(request, "Selección de cliente creada correctamente")
@@ -356,11 +357,23 @@ def procesoActualizarSeleccion(request):
         
         cliente_id = request.POST.get('cliente')
         email_cliente = request.POST.get('email_cliente')
+        estado = request.POST.get('estado')
+        notas_cancelacion = request.POST.get('notas_cancelacion', '')
         
         cliente = Usuario.objects.get(id=cliente_id)
         
         seleccion.cliente = cliente
         seleccion.email_cliente = email_cliente
+        seleccion.estado = estado
+        seleccion.notas_cancelacion = notas_cancelacion
+        
+        # Si cambia a ENVIADO, registrar fecha de envío
+        if estado == 'ENVIADO' and not seleccion.fecha_envio:
+            seleccion.fecha_envio = timezone.now()
+        # Si cambia de ENVIADO a otro estado, limpiar fecha de envío
+        elif estado != 'ENVIADO':
+            seleccion.fecha_envio = None
+        
         seleccion.save()
         
         messages.success(request, "Selección actualizada correctamente")
