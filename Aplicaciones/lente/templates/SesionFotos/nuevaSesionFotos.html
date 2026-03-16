@@ -1,0 +1,91 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<h1>Nueva Sesión de Fotos</h1>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+
+            <form action="{% url 'guardarSesion' %}" method="post" id="frm_nueva_sesion">
+                {% csrf_token %}
+                
+                <label for="nombre">Nombre de la Sesión: <br></label>
+                <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Ingrese el nombre de la sesión" required>
+                <div class="invalid-feedback" id="nombre-error"></div>
+
+                <br>
+
+                <label for="administrador">Administrador: <br></label>
+                <select name="administrador" class="form-control" id="administrador" required>
+                    <option value="">--Seleccione un administrador--</option>
+
+                    {% for admin in administradores %}
+                    <option value="{{ admin.id }}">
+                        {{ admin.nombre }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+                <div class="invalid-feedback" id="administrador-error"></div>
+
+                <br>
+
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <a href="{% url 'listado_sesiones' %}" class="btn btn-secondary">Cancelar</a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.error-message{
+    color:red;
+    font-size:14px;
+    margin-top:5px;
+}
+
+input.error, select.error{
+    border:1px solid red;
+}
+</style>
+
+<script>
+
+$("#frm_nueva_sesion").validate({
+
+    rules:{
+        nombre:{required:true},
+        administrador:{required:true}
+    },
+
+    messages:{
+        nombre:{
+            required:"El nombre de la sesión es obligatorio"
+        },
+
+        administrador:{
+            required:"Debe seleccionar un administrador"
+        }
+    },
+
+    errorClass:"error-message",
+
+    highlight:function(element){
+        $(element).addClass("error");
+    },
+
+    unhighlight:function(element){
+        $(element).removeClass("error");
+    }
+
+});
+
+</script>
+
+{% endblock %}

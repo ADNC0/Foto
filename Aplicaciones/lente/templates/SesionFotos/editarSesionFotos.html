@@ -1,0 +1,54 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<h1>EDITAR SESIÓN DE FOTOS</h1>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+
+            <form action="{% url 'procesoActualizarSesion' %}" method="post">
+                {% csrf_token %}
+
+                <input type="hidden" name="id" value="{{ sesionEditar.id }}">
+
+                <label><b>Nombre de la sesión:</b></label>
+                <input type="text" name="nombre" class="form-control"
+                value="{{ sesionEditar.nombre }}"
+                id="nombre"
+                placeholder="Ingrese el nombre de la sesión">
+
+                <br>
+
+                <label><b>Administrador:</b></label>
+                <select name="administrador" class="form-control" id="administrador">
+
+                    {% for admin in administradores %}
+                    <option value="{{ admin.id }}"
+                    {% if sesionEditar.administrador.id == admin.id %}selected{% endif %}>
+                    {{ admin.nombre }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+                <br>
+
+                <button type="submit" class="btn btn-warning">
+                    Actualizar
+                </button>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <a href="{% url 'listado_sesiones' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<br>
+{% endblock %}

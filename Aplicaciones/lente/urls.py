@@ -12,4 +12,11 @@ urlpatterns = [
     path('editarUsuario/<int:id>/',views.editarUsuario,name='editarUsuario'),
     path('procesoActualizarUsuario/',views.procesoActualizarUsuario,name='procesoActualizarUsuario'),
     path('eliminarUsuario/<int:id>/',views.eliminarUsuario,name='eliminarUsuario'),
+
+    path('nuevaSesion/',views.nuevaSesion,name='nuevaSesion'),
+    path('guardarSesion/',views.guardarSesion,name='guardarSesion'),
+    path('listado_sesiones/',views.listado_sesiones,name='listado_sesiones'),
+    path('editarSesion/<int:id>/',views.editarSesion,name='editarSesion'),
+    path('procesoActualizarSesion/',views.procesoActualizarSesion,name='procesoActualizarSesion'),
+    path('eliminarSesion/<int:id>/',views.eliminarSesion,name='eliminarSesion'),
 ]

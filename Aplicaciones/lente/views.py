@@ -109,3 +109,79 @@ def eliminarUsuario(request, id):
     usuario.delete()
     messages.success(request, "Usuario eliminado correctamente.")
     return redirect('listado_usuarios')
+
+#---------------------
+#SESION FOTOS
+#Logica de programacion sin esto las urls no funcionan, los botones no funcionan
+#---------------------
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import SesionFotos, Usuario
+
+
+def nuevaSesion(request):
+    administradores = Usuario.objects.filter(rol="ADMIN")
+    return render(request, "SesionFotos/nuevaSesionFotos.html", {
+        "administradores": administradores
+    })
+
+
+def guardarSesion(request):
+    if request.method == "POST":
+        nombre = request.POST["nombre"]
+        administrador_id = request.POST["administrador"]
+        administrador = Usuario.objects.get(id=administrador_id)
+
+        SesionFotos.objects.create(
+            nombre=nombre,
+            administrador=administrador
+        )
+
+        messages.success(request, "Nueva sesión creada con éxito.")
+        return redirect('listado_sesiones')
+    messages.error(request, "Método no permitido.")
+    return redirect('nuevaSesion')
+
+
+def listado_sesiones(request):
+
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    sesiones = SesionFotos.objects.all()
+    return render(request, "SesionFotos/listadoSesionFotos.html", {
+        'sesiones': sesiones
+    })
+
+def editarSesion(request, id):
+
+    sesion = get_object_or_404(SesionFotos, id=id)
+    administradores = Usuario.objects.filter(rol="ADMIN")
+
+    return render(request, "SesionFotos/editarSesionFotos.html", {
+        'sesionEditar': sesion,
+        'administradores': administradores
+    })
+
+
+def procesoActualizarSesion(request):
+
+    if request.method == "POST":
+        id_sesion = request.POST.get('id')
+        sesion = SesionFotos.objects.get(id=id_sesion)
+        nombre = request.POST.get('nombre')
+        administrador_id = request.POST.get('administrador')
+        administrador = Usuario.objects.get(id=administrador_id)
+        sesion.nombre = nombre
+        sesion.administrador = administrador
+        sesion.save()
+        messages.success(request, "Sesión actualizada correctamente.")
+        return redirect('listado_sesiones')
+
+    return redirect('listado_sesiones')
+
+def eliminarSesion(request, id):
+
+    sesion = get_object_or_404(SesionFotos, id=id)
+    sesion.delete()
+    messages.success(request, "Sesión eliminada correctamente.")
+    return redirect('listado_sesiones')
