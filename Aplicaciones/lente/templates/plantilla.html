@@ -78,7 +78,7 @@ border:1px solid red;
 </li>
 
 <li class="nav-item">
-<a class="nav-link" href="#">Services</a>
+<a class="nav-link" href="{% url 'listado_fotos' %}">Fotos</a>
 </li>
 
 <li class="nav-item">
@@ -179,6 +179,25 @@ responsive:{
 1000:{items:3}
 }
 })
+</script>
+<!-- restricciones -->
+<script>
+      document.getElementById("imagen").addEventListener("change", function(){
+      let archivo = this.files[0];
+      if(!archivo) return;
+      let extensionesPermitidas = [
+      "jpg","jpeg","png","gif","bmp","tiff","tif","raw","webp",
+      "heif","heic","svg","psd","dng","cr2","cr3","nef","arw",
+      "orf","raf","sr2","srf","pef","rw2","x3f","3fr","erf",
+      "mef","mos","iiq"
+      ];
+
+      let extension = archivo.name.split('.').pop().toLowerCase();
+      if(!extensionesPermitidas.includes(extension)){
+      alert("Solo se permiten archivos de imagen.");
+      this.value = "";
+      }
+      });
 </script>
 
 </body>

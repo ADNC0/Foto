@@ -1,0 +1,44 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center mb-4">Subir Fotos</h2>
+            
+            <form action="{% url 'guardarFoto' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group mb-3">
+                    <label for="sesion" class="form-label">Nombre de la sesión</label>
+                    <br>
+                    <select name="sesion" id="sesion" class="form-control" required>
+                        <option value="">Seleccione sesión</option>
+                        {% for s in sesiones %}
+                        <option value="{{ s.id }}">{{ s.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+<br><br>
+                <div class="form-group mb-3">
+                    <label for="imagenes" class="form-label">Seleccionar fotos</label>
+                    <br>
+                    <input type="file"
+                        name="imagenes"
+                        id="imagenes"
+                        class="form-control"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff,.tif,.raw,.webp,.heif,.heic,.svg,.psd,.dng,.cr2,.cr3,.nef,.arw,.orf,.raf">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Subir Foto</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="{% url 'listado_fotos' %}" class="btn btn-secondary">Cancelar</a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
