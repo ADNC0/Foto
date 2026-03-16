@@ -1,0 +1,67 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<h1>EDITAR USUARIO</h1>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+
+            <form action="{% url 'procesoActualizarUsuario' %}" method="post">
+                {% csrf_token %}
+
+                <input type="hidden" name="id" value="{{ usuarioEditar.id }}">
+
+                <label><b>Nombre:</b></label>
+                <input type="text" name="nombre" class="form-control"
+                value="{{ usuarioEditar.nombre }}"
+                id="nombre"
+                placeholder="Ingrese el nombre del usuario">
+
+                <label><b>Correo:</b></label>
+                <input type="email" name="email" class="form-control"
+                value="{{ usuarioEditar.email }}"
+                id="email"
+                placeholder="Ingrese el correo del usuario">
+
+                <label><b>Contraseña:</b></label>
+                <input type="password" name="password" class="form-control"
+                value="{{ usuarioEditar.password }}"
+                id="password"
+                placeholder="Ingrese la contraseña">
+
+                <label><b>Rol:</b></label>
+                <select name="rol" class="form-control" id="rol">
+
+                    <option value="ADMIN"
+                    {% if usuarioEditar.rol == 'ADMIN' %}selected{% endif %}>
+                    Administrador
+                    </option>
+
+                    <option value="CLIENTE"
+                    {% if usuarioEditar.rol == 'CLIENTE' %}selected{% endif %}>
+                    Cliente
+                    </option>
+
+                </select>
+
+                <br>
+
+                <button type="submit" class="btn btn-warning">
+                    Actualizar
+                </button>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <a href="{% url 'listado_usuarios' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<br>
+{% endblock %}

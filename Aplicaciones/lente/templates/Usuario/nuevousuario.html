@@ -1,0 +1,105 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<h1>Nuevo Usuario</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+
+            <form action="{% url 'guardarUsuario' %}" method="post" id="frm_nuevo_usuario">
+                {% csrf_token %}
+                
+                <label for="nombre">Nombre: <br></label>
+                <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Ingrese el nombre del usuario" required>
+                <div class="invalid-feedback" id="nombre-error"></div>
+
+                <label for="email">Correo electrónico: <br></label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Ingrese el correo electrónico" required>
+                <div class="invalid-feedback" id="email-error"></div>
+
+                <label for="password">Contraseña: <br></label>
+                <input type="password" name="password" class="form-control" id="password" placeholder="Ingrese la contraseña" required>
+                <div class="invalid-feedback" id="password-error"></div>
+
+                <label for="rol">Rol: <br></label>
+                <select name="rol" class="form-control" id="rol" required>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="CLIENTE">Cliente</option>
+                </select>
+                <div class="invalid-feedback" id="rol-error"></div>
+
+                <br>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="{% url 'listado_usuarios' %}" class="btn btn-secondary">Cancelar</a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Importar jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Importar jQuery Validation -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
+<style>
+.error-message{
+    color:red;
+    font-size:14px;
+    margin-top:5px;
+}
+
+input.error, select.error{
+    border:1px solid red;
+}
+</style>
+
+<script>
+
+$("#frm_nuevo_usuario").validate({
+
+    rules:{
+        nombre:{required:true},
+        email:{required:true,email:true},
+        password:{required:true,minlength:4},
+        rol:{required:true}
+    },
+
+    messages:{
+        nombre:{
+            required:"El nombre es obligatorio"
+        },
+
+        email:{
+            required:"El correo electrónico es obligatorio",
+            email:"Ingrese un correo válido"
+        },
+
+        password:{
+            required:"La contraseña es obligatoria",
+            minlength:"La contraseña debe tener al menos 4 caracteres"
+        },
+
+        rol:{
+            required:"Debe seleccionar un rol"
+        }
+    },
+
+    errorClass:"error-message",
+
+    highlight:function(element){
+        $(element).addClass("error");
+    },
+
+    unhighlight:function(element){
+        $(element).removeClass("error");
+    }
+
+});
+
+</script>
+
+{% endblock %}
