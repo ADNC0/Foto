@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
+from django.utils import timezone
+import os
 from .models import Usuario, SesionFotos, Foto, SeleccionCliente, FotoSeleccionada
 
 def home(request):
@@ -479,5 +483,98 @@ def asignarEmailSeleccion(request, seleccion_id):
         return redirect('listado_selecciones')
     
     return render(request, "FotoSeleccionada/asignarEmail.html", {
+        "seleccion": seleccion
+    })
+
+def enviarSeleccion(request, seleccion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo ADMIN puede enviar emails
+    if request.session.get('rol') != 'ADMIN':
+        messages.error(request, "No tienes permisos para enviar emails")
+        return redirect('listado_selecciones')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=seleccion_id)
+    fotos_seleccionadas = FotoSeleccionada.objects.filter(seleccion=seleccion)
+    
+    # Verificar que haya fotos seleccionadas y email asignado
+    if not fotos_seleccionadas.exists():
+        messages.error(request, "No hay fotos seleccionadas para enviar")
+        return redirect('listado_selecciones')
+    
+    if not seleccion.email_cliente:
+        messages.error(request, "Primero debes asignar un email de destino")
+        return redirect('asignar_email_seleccion', seleccion_id=seleccion_id)
+    
+    try:
+        # Crear email con adjuntos
+        email = EmailMessage(
+            subject=f'Fotos seleccionadas por {seleccion.cliente.nombre}',
+            body=f'''
+Hola, {seleccion.email_cliente}
+
+Te enviamos las fotos que has seleccionado de nuestra galería.
+
+Cliente: {seleccion.cliente.nombre}
+Fecha de selección: {seleccion.fecha|date:"d/m/Y H:i"}
+Total de fotos: {fotos_seleccionadas.count()}
+
+Esperamos que disfrutes tus fotos seleccionadas.
+
+Saludos,
+Arcano Fotografía
+            ''',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[seleccion.email_cliente],
+        )
+        
+        # Adjuntar las fotos
+        for foto_seleccionada in fotos_seleccionadas:
+            foto_path = foto_seleccionada.foto.imagen.path
+            if os.path.exists(foto_path):
+                email.attach_file(foto_path)
+        
+        # Enviar email
+        email.send()
+        
+        # Actualizar estado y fecha de envío
+        seleccion.estado = 'ENVIADO'
+        seleccion.fecha_envio = timezone.now()
+        seleccion.save()
+        
+        messages.success(request, f"¡Email enviado exitosamente a {seleccion.email_cliente} con {fotos_seleccionadas.count()} fotos!")
+        
+    except Exception as e:
+        messages.error(request, f"Error al enviar email: {str(e)}")
+    
+    return redirect('listado_selecciones')
+
+def cancelarSeleccion(request, seleccion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=seleccion_id)
+    
+    # Solo puede cancelar el cliente dueño de la selección o el admin
+    if request.session.get('rol') == 'CLIENTE' and seleccion.cliente.id != request.session['usuario_id']:
+        messages.error(request, "No puedes cancelar esta selección")
+        return redirect('mis_selecciones')
+    
+    if request.method == 'POST':
+        notas = request.POST.get('notas_cancelacion', '')
+        
+        seleccion.estado = 'CANCELADO'
+        seleccion.notas_cancelacion = notas
+        seleccion.save()
+        
+        messages.success(request, "La selección ha sido cancelada")
+        
+        if request.session.get('rol') == 'CLIENTE':
+            return redirect('mis_selecciones')
+        else:
+            return redirect('listado_selecciones')
+    
+    return render(request, "SeleccionCliente/cancelarSeleccion.html", {
         "seleccion": seleccion
     })

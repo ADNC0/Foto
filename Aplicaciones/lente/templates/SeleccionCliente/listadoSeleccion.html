@@ -39,6 +39,7 @@
                         <th style="color: green;">Fecha Creación</th>
                         <th style="color: green;">Fotos Seleccionadas</th>
                     <th style="color: blue;">Email de Envío</th>
+                    <th style="color: purple;">Estado</th>
                     <th style="color: orange;">Acciones</th>
                     </tr>
                 </thead>
@@ -63,31 +64,54 @@
                             {% endif %}
                         </td>
                         <td>
+                            <span class="badge 
+                                {% if seleccion.estado == 'PENDIENTE' %}bg-warning
+                                {% elif seleccion.estado == 'ENVIADO' %}bg-success
+                                {% elif seleccion.estado == 'CANCELADO' %}bg-danger{% endif %}">
+                                {{ seleccion.get_estado_display }}
+                            </span>
+                            {% if seleccion.fecha_envio %}
+                                <br><small>{{ seleccion.fecha_envio|date:"d/m/Y H:i" }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
                             <a href="{% url 'ver_fotos_seleccionadas' seleccion.id %}" 
                                class="btn btn-info btn-sm" title="Ver fotos seleccionadas">
                                 Ver
                             </a>
-                            <a href="{% url 'asignar_email_seleccion' seleccion.id %}" 
-                               class="btn btn-primary btn-sm" title="Asignar email de envío">
-                                Email
-                            </a>
-                            <a href="{% url 'editarSeleccion' seleccion.id %}" 
-                               class="btn btn-warning btn-sm" title="Editar">
-                                Editar
-                            </a>
+                            {% if seleccion.estado != 'ENVIADO' and seleccion.estado != 'CANCELADO' %}
+                                <a href="{% url 'asignar_email_seleccion' seleccion.id %}" 
+                                   class="btn btn-primary btn-sm" title="Asignar email de envío">
+                                    Email
+                                </a>
+                                <a href="{% url 'enviarSeleccion' seleccion.id %}" 
+                                   class="btn btn-success btn-sm" title="Enviar fotos"
+                                   onclick="return confirm('¿Estás seguro de enviar las fotos seleccionadas?')">
+                                    Enviar
+                                </a>
+                            {% endif %}
+                            {% if seleccion.estado == 'PENDIENTE' %}
+                                <a href="{% url 'cancelarSeleccion' seleccion.id %}" 
+                                   class="btn btn-danger btn-sm" title="Cancelar selección">
+                                    Cancelar
+                                </a>
+                            {% endif %}
+                            {% if seleccion.estado != 'ENVIADO' %}
+                                <a href="{% url 'editarSeleccion' seleccion.id %}" 
+                                   class="btn btn-warning btn-sm" title="Editar">
+                                    Editar
+                                </a>
+                            {% endif %}
                             <a href="{% url 'eliminarSeleccion' seleccion.id %}" 
                                onclick="return confirm('¿Estás seguro de eliminar esta selección?')" 
                                class="btn btn-danger btn-sm" title="Eliminar">
                                 Eliminar
                             </a>
-                            <a href="#" class="btn btn-success btn-sm" title="Enviar">
-                                Enviar
-                            </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center">
+                        <td colspan="8" class="text-center">
                             No hay selecciones registradas
                         </td>
                     </tr>

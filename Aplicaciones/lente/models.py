@@ -43,13 +43,22 @@ class Foto(models.Model):
 
 class SeleccionCliente(models.Model):
 
+    ESTADO_CHOICES = [
+        ('PENDIENTE', 'Pendiente de envío'),
+        ('ENVIADO', 'Enviado correctamente'),
+        ('CANCELADO', 'Cancelado por cliente'),
+    ]
+
     id = models.AutoField(primary_key=True)
     cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     email_cliente = models.EmailField()
     fecha = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='PENDIENTE')
+    fecha_envio = models.DateTimeField(null=True, blank=True)
+    notas_cancelacion = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Seleccion de {self.cliente.nombre}"
+        return f"Seleccion de {self.cliente.nombre} - {self.estado}"
 
 
 class FotoSeleccionada(models.Model):

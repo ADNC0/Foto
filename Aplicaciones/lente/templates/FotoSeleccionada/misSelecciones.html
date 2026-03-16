@@ -45,14 +45,26 @@
                            class="btn btn-primary btn-sm">
                             Ver Fotos Seleccionadas
                         </a>
+                        {% if seleccion.estado == 'PENDIENTE' %}
+                        <br><br>
+                        <a href="{% url 'cancelarSeleccion' seleccion.id %}" 
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('¿Estás seguro que deseas cancelar esta selección?')">
+                            Cancelar Selección
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="card-footer text-muted">
                     <small>Estado: 
-                        {% if seleccion.email_cliente %}
-                             Email asignado
-                        {% else %}
-                             Esperando asignación de email
+                        <span class="badge 
+                            {% if seleccion.estado == 'PENDIENTE' %}bg-warning
+                            {% elif seleccion.estado == 'ENVIADO' %}bg-success
+                            {% elif seleccion.estado == 'CANCELADO' %}bg-danger{% endif %}">
+                            {{ seleccion.get_estado_display }}
+                        </span>
+                        {% if seleccion.fecha_envio %}
+                            <br>Enviado: {{ seleccion.fecha_envio|date:"d/m/Y H:i" }}
                         {% endif %}
                     </small>
                 </div>

@@ -40,5 +40,7 @@ urlpatterns = [
     path('mis_selecciones/',views.misSelecciones,name='mis_selecciones'),
     path('ver_fotos_seleccionadas/<int:seleccion_id>/',views.verFotosSeleccionadas,name='ver_fotos_seleccionadas'),
     path('asignar_email_seleccion/<int:seleccion_id>/',views.asignarEmailSeleccion,name='asignar_email_seleccion'),
+    path('enviar_seleccion/<int:seleccion_id>/',views.enviarSeleccion,name='enviarSeleccion'),
+    path('cancelar_seleccion/<int:seleccion_id>/',views.cancelarSeleccion,name='cancelarSeleccion'),
     
 ]

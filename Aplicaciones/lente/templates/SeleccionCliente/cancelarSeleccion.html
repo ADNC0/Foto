@@ -1,0 +1,80 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center mb-4">Cancelar Selección</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Información de la Selección</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Cliente:</strong> {{ seleccion.cliente.nombre }}</p>
+                    <p><strong>Email de envío:</strong> {{ seleccion.email_cliente }}</p>
+                    <p><strong>Fecha de selección:</strong> {{ seleccion.fecha|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Fotos seleccionadas:</strong> 
+                        {% with foto_count=seleccion.fotoseleccionada_set.count %}
+                            {{ foto_count }} foto{{ foto_count|pluralize }}
+                        {% endwith %}
+                    </p>
+                    <p><strong>Estado actual:</strong> 
+                        <span class="badge 
+                            {% if seleccion.estado == 'PENDIENTE' %}bg-warning
+                            {% elif seleccion.estado == 'ENVIADO' %}bg-success
+                            {% elif seleccion.estado == 'CANCELADO' %}bg-danger{% endif %}">
+                            {{ seleccion.get_estado_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+            
+            <form method="post" action="{% url 'cancelarSeleccion' seleccion.id %}">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="notas_cancelacion" class="form-label">
+                        <strong>Notas de cancelación (opcional):</strong>
+                    </label>
+                    <textarea name="notas_cancelacion" 
+                              id="notas_cancelacion" 
+                              class="form-control" 
+                              rows="4" 
+                              placeholder="¿Por qué cancelas esta selección? (Opcional)"></textarea>
+                    <small class="form-text text-muted">
+                        Puedes agregar el motivo de la cancelación para referencia futura
+                    </small>
+                </div>
+
+                <div class="alert alert-warning">
+                    <h5>⚠️ Confirmación de cancelación</h5>
+                    <p>¿Estás seguro que deseas cancelar esta selección?</p>
+                    <ul>
+                        <li>El estado cambiará a "Cancelado"</li>
+                        <li>No se podrán enviar las fotos</li>
+                        <li>Esta acción se puede revertir contactando al administrador</li>
+                    </ul>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger">
+                        Confirmar Cancelación
+                    </button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% if request.session.rol == 'CLIENTE' %}
+                        <a href="{% url 'mis_selecciones' %}" class="btn btn-secondary">
+                            Volver a Mis Selecciones
+                        </a>
+                    {% else %}
+                        <a href="{% url 'listado_selecciones' %}" class="btn btn-secondary">
+                            Volver a Listado
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

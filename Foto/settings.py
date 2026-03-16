@@ -127,3 +127,12 @@ DEBUG = True
 # CONFIGURACION PARA PRODUCCION
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465  # Cambia el puerto a 465 para SSL
+EMAIL_USE_TLS = False  # Desactiva TLS si usas el puerto 465
+EMAIL_USE_SSL = True  # Usa SSL en lugar de TLS
+EMAIL_HOST_USER = 'abraham.nacimba5565@utc.edu.ec'
+EMAIL_HOST_PASSWORD = 'talo btem bset ahrh'
+
+DEFAULT_FROM_EMAIL = 'abraham.nacimba5565@utc.edu.ec'
