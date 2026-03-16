@@ -5,6 +5,51 @@ from .models import Usuario
 
 def home(request):
     return render(request,"home.html")
+
+def login(request):
+
+    if request.method == "POST":
+
+        email = request.POST["email"]
+        password = request.POST["password"]
+
+        try:
+
+            usuario = Usuario.objects.get(email=email, password=password)
+
+            request.session["usuario_id"] = usuario.id
+            request.session["rol"] = usuario.rol
+
+            return redirect("home")
+
+        except Usuario.DoesNotExist:
+
+            return render(request,"login.html",{
+                "error":"Usuario o contraseña incorrectos"
+            })
+
+    return render(request,"login.html")
+
+def registro(request):
+
+    if request.method == "POST":
+        nombre = request.POST["nombre"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+
+        Usuario.objects.create(
+            nombre=nombre,
+            email=email,
+            password=password,
+            rol="CLIENTE"
+        )
+
+        return redirect("login")
+    return render(request,"registro.html")
+
+def cerrar_sesion(request):
+    request.session.flush()
+    return redirect("login")
 #---------------------
 #USUARIO
 #Logica de programacion sin esto las urls no funcionan, los botones no funcionan
@@ -31,9 +76,12 @@ def guardarUsuario(request):
     return redirect('nuevoUsuario')
 
 def listado_usuarios(request):
+
+    if 'usuario_id' not in request.session:
+        return redirect('login')
     usuarios = Usuario.objects.all()
-    return render(request, "Usuario/listadousuario.html", {
-        'usuarios': usuarios
+    return render(request,"Usuario/listadousuario.html",{
+        'usuarios':usuarios
     })
 
 def editarUsuario(request, id):

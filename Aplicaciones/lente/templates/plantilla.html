@@ -78,10 +78,6 @@ border:1px solid red;
 </li>
 
 <li class="nav-item">
-<a class="nav-link" href="{% url 'listado_usuarios' %}">Usuarios</a>
-</li>
-
-<li class="nav-item">
 <a class="nav-link" href="#">Services</a>
 </li>
 
@@ -105,11 +101,11 @@ border:1px solid red;
 </div>
 </form>
 
-<div class="call_btn">
-<a href="#"><i class="fa fa-phone"></i>
-<span class="padding_left10">Call : +1234567890</span>
-</a>
-</div>
+<li class="nav-item">
+    <a class="nav-link text-danger" href="{% url 'logout' %}">
+        Cerrar sesión
+    </a>
+</li>
 
 </div>
 </nav>
