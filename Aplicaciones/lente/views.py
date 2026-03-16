@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Usuario, SesionFotos, Foto
+from .models import Usuario, SesionFotos, Foto, SeleccionCliente, FotoSeleccionada
 
 def home(request):
     return render(request,"home.html")
@@ -287,3 +287,197 @@ def eliminarFotosSesion(request, sesion_id):
             messages.warning(request, "No seleccionaste ninguna foto")
     
     return redirect('fotos_por_sesion', sesion_id=sesion_id)
+
+#--------------------
+#SELECCION CLIENTE
+#--------------------
+def nuevaSeleccion(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    clientes = Usuario.objects.filter(rol='CLIENTE')
+    return render(request, "SeleccionCliente/nuevaSeleccion.html", {
+        "clientes": clientes
+    })
+
+def guardarSeleccion(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    if request.method == "POST":
+        cliente_id = request.POST["cliente"]
+        email_cliente = request.POST["email_cliente"]
+        
+        cliente = Usuario.objects.get(id=cliente_id)
+        
+        SeleccionCliente.objects.create(
+            cliente=cliente,
+            email_cliente=email_cliente
+        )
+        
+        messages.success(request, "Selección de cliente creada correctamente")
+        return redirect('listado_selecciones')
+    
+    messages.error(request, "Método no permitido")
+    return redirect('nuevaSeleccion')
+
+def listado_selecciones(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    selecciones = SeleccionCliente.objects.all()
+    return render(request, "SeleccionCliente/listadoSeleccion.html", {
+        "selecciones": selecciones
+    })
+
+def editarSeleccion(request, id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=id)
+    clientes = Usuario.objects.filter(rol='CLIENTE')
+    
+    return render(request, "SeleccionCliente/editarSeleccion.html", {
+        "seleccionEditar": seleccion,
+        "clientes": clientes
+    })
+
+def procesoActualizarSeleccion(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    if request.method == "POST":
+        id_seleccion = request.POST.get('id')
+        seleccion = SeleccionCliente.objects.get(id=id_seleccion)
+        
+        cliente_id = request.POST.get('cliente')
+        email_cliente = request.POST.get('email_cliente')
+        
+        cliente = Usuario.objects.get(id=cliente_id)
+        
+        seleccion.cliente = cliente
+        seleccion.email_cliente = email_cliente
+        seleccion.save()
+        
+        messages.success(request, "Selección actualizada correctamente")
+        return redirect('listado_selecciones')
+    
+    return redirect('listado_selecciones')
+
+def eliminarSeleccion(request, id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=id)
+    seleccion.delete()
+    messages.success(request, "Selección eliminada correctamente")
+    return redirect('listado_selecciones')
+
+#--------------------
+#FOTO SELECCIONADA (PARA CLIENTES)
+#--------------------
+def seleccionarFotos(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo CLIENTES pueden seleccionar fotos
+    if request.session.get('rol') != 'CLIENTE':
+        messages.error(request, "Solo los clientes pueden seleccionar fotos")
+        return redirect('home')
+    
+    fotos = Foto.objects.all()
+    return render(request, "FotoSeleccionada/seleccionarFotos.html", {
+        "fotos": fotos
+    })
+
+def guardarSeleccionFotos(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo CLIENTES pueden seleccionar fotos
+    if request.session.get('rol') != 'CLIENTE':
+        messages.error(request, "Solo los clientes pueden seleccionar fotos")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        fotos_seleccionadas = request.POST.getlist('fotos_seleccionadas')
+        
+        if not fotos_seleccionadas:
+            messages.warning(request, "No seleccionaste ninguna foto")
+            return redirect('seleccionar_fotos')
+        
+        # Obtener el cliente actual
+        cliente = Usuario.objects.get(id=request.session['usuario_id'])
+        
+        # Crear o actualizar la selección del cliente
+        seleccion, created = SeleccionCliente.objects.get_or_create(
+            cliente=cliente,
+            defaults={'email_cliente': cliente.email}
+        )
+        
+        # Eliminar selecciones anteriores de este cliente
+        FotoSeleccionada.objects.filter(seleccion=seleccion).delete()
+        
+        # Guardar nuevas selecciones
+        for foto_id in fotos_seleccionadas:
+            foto = Foto.objects.get(id=foto_id)
+            FotoSeleccionada.objects.create(
+                seleccion=seleccion,
+                foto=foto
+            )
+        
+        messages.success(request, f"¡Perfecto! Has seleccionado {len(fotos_seleccionadas)} fotos. El administrador recibirá tu selección.")
+        return redirect('mis_selecciones')
+    
+    return redirect('seleccionar_fotos')
+
+def misSelecciones(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo CLIENTES pueden ver sus selecciones
+    if request.session.get('rol') != 'CLIENTE':
+        messages.error(request, "Esta sección es solo para clientes")
+        return redirect('home')
+    
+    cliente = Usuario.objects.get(id=request.session['usuario_id'])
+    selecciones = SeleccionCliente.objects.filter(cliente=cliente)
+    
+    return render(request, "FotoSeleccionada/misSelecciones.html", {
+        "selecciones": selecciones
+    })
+
+def verFotosSeleccionadas(request, seleccion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=seleccion_id)
+    fotos_seleccionadas = FotoSeleccionada.objects.filter(seleccion=seleccion)
+    
+    return render(request, "FotoSeleccionada/verFotosSeleccionadas.html", {
+        "seleccion": seleccion,
+        "fotos": fotos_seleccionadas
+    })
+
+def asignarEmailSeleccion(request, seleccion_id):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    # Solo ADMIN puede asignar emails
+    if request.session.get('rol') != 'ADMIN':
+        messages.error(request, "No tienes permisos para asignar emails")
+        return redirect('listado_selecciones')
+    
+    seleccion = get_object_or_404(SeleccionCliente, id=seleccion_id)
+    
+    if request.method == 'POST':
+        email_destino = request.POST.get('email_destino')
+        seleccion.email_cliente = email_destino
+        seleccion.save()
+        
+        messages.success(request, f"Email asignado correctamente: {email_destino}")
+        return redirect('listado_selecciones')
+    
+    return render(request, "FotoSeleccionada/asignarEmail.html", {
+        "seleccion": seleccion
+    })

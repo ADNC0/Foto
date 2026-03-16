@@ -1,0 +1,107 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Selecciona tus fotos favoritas</h2>
+            <p class="text-muted">Marca las fotos que te gusten y haz clic en "Guardar Selección"</p>
+            <a href="{% url 'listado_fotos' %}" class="btn btn-secondary">← Volver a Galería</a>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'guardarSeleccionFotos' %}" id="frm_seleccion_fotos">
+        {% csrf_token %}
+        
+        <!-- Agrupar fotos por sesión -->
+        {% regroup fotos by sesion as sesiones_con_fotos %}
+        
+        {% for sesion in sesiones_con_fotos %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                     {{ sesion.grouper.nombre }}
+                    <span class="badge bg-secondary">{{ sesion.list|length }} fotos</span>
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <div class="row">
+                    {% for foto in sesion.list %}
+                    <div class="col-md-3 col-sm-4 col-6 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ foto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body text-center p-2">
+                                <h6 class="card-title small">{{ foto.nombre|truncatechars:20 }}</h6>
+                                
+                                <div class="form-check">
+                                    <input type="checkbox" 
+                                           name="fotos_seleccionadas" 
+                                           value="{{ foto.id }}" 
+                                           class="form-check-input"
+                                           id="foto_{{ foto.id }}">
+                                    <label class="form-check-label" for="foto_{{ foto.id }}">
+                                        Seleccionar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No hay fotos disponibles para seleccionar</p>
+        </div>
+        {% endfor %}
+
+        {% if fotos %}
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-success btn-lg">
+                    Guardar mi Selección de Fotos
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.form-check-input:checked + .form-check-label {
+    color: #28a745;
+    font-weight: bold;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+    // Contador de fotos seleccionadas
+    function actualizarContador() {
+        var seleccionadas = $('input[name="fotos_seleccionadas"]:checked').length;
+        if (seleccionadas > 0) {
+            $('button[type="submit"]').html('Guardar mi Selección (' + seleccionadas + ' fotos)');
+        } else {
+            $('button[type="submit"]').html('Guardar mi Selección de Fotos');
+        }
+    }
+    
+    // Actualizar contador cuando cambia la selección
+    $('input[name="fotos_seleccionadas"]').change(function() {
+        actualizarContador();
+    });
+    
+    // Inicializar contador
+    actualizarContador();
+});
+</script>
+
+{% endblock %}

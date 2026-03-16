@@ -1,0 +1,54 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Mis Fotos Seleccionadas</h2>
+            <p class="text-muted">
+                <strong>Cliente:</strong> {{ seleccion.cliente.nombre }}<br>
+                <strong>Email de envío:</strong> {{ seleccion.email_cliente }}<br>
+                <strong>Fecha:</strong> {{ seleccion.fecha|date:"d/m/Y H:i" }}
+            </p>
+            <a href="{% url 'mis_selecciones' %}" class="btn btn-secondary">← Volver a Mis Selecciones</a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for foto_seleccionada in fotos %}
+        <div class="col-md-3 col-sm-4 col-6 mb-3">
+            <div class="card h-100">
+                <img src="{{ foto_seleccionada.foto.imagen.url }}" 
+                     class="card-img-top" 
+                     style="height: 200px; object-fit: cover;">
+                <div class="card-body text-center p-2">
+                    <h6 class="card-title small">{{ foto_seleccionada.foto.nombre|truncatechars:20 }}</h6>
+                    <small class="text-muted">
+                        Sesión: {{ foto_seleccionada.foto.sesion.nombre }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                <h4>No hay fotos seleccionadas</h4>
+                <p>Esta selección no contiene fotos aún</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if fotos %}
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="alert alert-success">
+                <h4>¡Selección Completa!</h4>
+                <p>Has seleccionado {{ fotos|length }} fotos. Estas serán enviadas a: <strong>{{ seleccion.email_cliente }}</strong></p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

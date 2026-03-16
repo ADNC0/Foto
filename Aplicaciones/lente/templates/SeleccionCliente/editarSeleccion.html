@@ -1,0 +1,99 @@
+{% extends "plantilla.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center mb-4">Editar Selección de Cliente</h2>
+            
+            <form action="{% url 'procesoActualizarSeleccion' %}" method="post" id="frm_editar_seleccion">
+                {% csrf_token %}
+                
+                <input type="hidden" name="id" value="{{ seleccionEditar.id }}">
+                
+                <div class="form-group mb-3">
+                    <label for="cliente" class="form-label">Cliente:</label>
+                    <select name="cliente" id="cliente" class="form-control" required>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}"
+                                {% if seleccionEditar.cliente.id == cliente.id %}selected{% endif %}>
+                            {{ cliente.nombre }} ({{ cliente.email }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="email_cliente" class="form-label">Correo electrónico del cliente:</label>
+                    <input type="email" name="email_cliente" class="form-control" id="email_cliente" 
+                           value="{{ seleccionEditar.email_cliente }}"
+                           placeholder="Ingrese el correo electrónico" required>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-warning">
+                        Actualizar Selección
+                    </button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="{% url 'listado_selecciones' %}" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Importar jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Importar jQuery Validation -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
+<style>
+.error-message{
+    color:red;
+    font-size:14px;
+    margin-top:5px;
+}
+
+input.error, select.error{
+    border:1px solid red;
+}
+</style>
+
+<script>
+
+$("#frm_editar_seleccion").validate({
+
+    rules:{
+        cliente:{required:true},
+        email_cliente:{required:true,email:true}
+    },
+
+    messages:{
+        cliente:{
+            required:"Debe seleccionar un cliente"
+        },
+
+        email_cliente:{
+            required:"El correo electrónico es obligatorio",
+            email:"Ingrese un correo válido"
+        }
+    },
+
+    errorClass:"error-message",
+
+    highlight:function(element){
+        $(element).addClass("error");
+    },
+
+    unhighlight:function(element){
+        $(element).removeClass("error");
+    }
+
+});
+
+</script>
+
+{% endblock %}

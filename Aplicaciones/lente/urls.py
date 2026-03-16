@@ -27,5 +27,18 @@ urlpatterns = [
     path('eliminarTodasLasFotos/',views.eliminarTodasLasFotos,name='eliminarTodasLasFotos'),
     path('fotos_por_sesion/<int:sesion_id>/',views.fotosPorSesion,name='fotos_por_sesion'),
     path('eliminar_fotos_sesion/<int:sesion_id>/',views.eliminarFotosSesion,name='eliminar_fotos_sesion'),
+
+    path('nuevaSeleccion/',views.nuevaSeleccion,name='nuevaSeleccion'),
+    path('guardarSeleccion/',views.guardarSeleccion,name='guardarSeleccion'),
+    path('listado_selecciones/',views.listado_selecciones,name='listado_selecciones'),
+    path('editarSeleccion/<int:id>/',views.editarSeleccion,name='editarSeleccion'),
+    path('procesoActualizarSeleccion/',views.procesoActualizarSeleccion,name='procesoActualizarSeleccion'),
+    path('eliminarSeleccion/<int:id>/',views.eliminarSeleccion,name='eliminarSeleccion'),
+
+    path('seleccionar_fotos/',views.seleccionarFotos,name='seleccionar_fotos'),
+    path('guardarSeleccionFotos/',views.guardarSeleccionFotos,name='guardarSeleccionFotos'),
+    path('mis_selecciones/',views.misSelecciones,name='mis_selecciones'),
+    path('ver_fotos_seleccionadas/<int:seleccion_id>/',views.verFotosSeleccionadas,name='ver_fotos_seleccionadas'),
+    path('asignar_email_seleccion/<int:seleccion_id>/',views.asignarEmailSeleccion,name='asignar_email_seleccion'),
     
 ]
