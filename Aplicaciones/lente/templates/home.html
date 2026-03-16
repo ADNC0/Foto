@@ -1,0 +1,75 @@
+{% extends './plantilla.html' %}
+{% load static %}
+
+{% block body %}
+
+<!-- banner section start -->
+<div class="banner_section layout_padding">
+    <div class="container">
+
+        <img src="{% static 'plantilla/Profusion-1.0.0/images/banner-img.png' %}" class="banner_img">
+
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+
+            <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+            </ol>
+
+            <div class="carousel-inner">
+
+                <div class="carousel-item active">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 class="banner_taital">Start Dance</h1>
+                            <div class="contact_bt">
+                                <a href="#">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 class="banner_taital">Start Dance</h1>
+                            <div class="contact_bt">
+                                <a href="#">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 class="banner_taital">Start Dance</h1>
+                            <div class="contact_bt">
+                                <a href="#">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 class="banner_taital">Start Dance</h1>
+                            <div class="contact_bt">
+                                <a href="#">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- banner section end -->
+
+{% endblock %}
